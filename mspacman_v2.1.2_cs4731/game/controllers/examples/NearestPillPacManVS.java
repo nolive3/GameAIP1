@@ -30,10 +30,10 @@ public final class NearestPillPacManVS implements PacManController
 		int nearest=game.getTarget(current,targetsArray,true,G.DM.PATH);		
 		
 		//add the path that Ms Pac-Man is following
-//		GameView.addPoints(game,Color.GREEN,game.getPath(current,nearest));
+		GameView.addPoints(game,Color.GREEN,game.getPath(current,nearest));
 		
 		//add the path from Ms Pac-Man to the first power pill
-		GameView.addPoints(game,Color.CYAN,game.getPath(current,game.getPowerPillIndices()[0]));
+//		GameView.addPoints(game,Color.CYAN,game.getPath(current,game.getPowerPillIndices()[0]));
 		
 		//add the path AND ghost path from Ghost 0 to the first power pill (to illustrate the differences)
 //		if(game.getLairTime(0)==0)
