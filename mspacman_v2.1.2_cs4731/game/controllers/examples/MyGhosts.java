@@ -11,39 +11,94 @@ public class MyGhosts implements GhostController
 	private boolean Debugging = false;
 	private long starttime;
 	private boolean firstround;
+	private int[][] targets;
+	private static final int X = 0;
+	private static final int Y = 1;
 	private static final int INKY = 0;
 	private static final int BLINKY = 1;
 	private static final int PINKY = 2;
 	private static final int CLIDE = 3;
-	
+	private static final int SCATTER = 0;
+	private static final int CHASE = 1;
+
+
 	public MyGhosts(boolean debugging)
 	{
 		Debugging = debugging;
+		targets = new int[Game.NUM_GHOSTS][2];
 		firstround = true;
 	}
 
-	private int inkyMove(Game game, long curtime){
-		switch ((int)((curtime-starttime)/1000)%4){
-			case 0: return Game.UP;
-			case 1: return Game.DOWN;
-			case 2: return Game.LEFT;
-			default:return Game.RIGHT;
+	private long dist(int[] pos, int[] target){
+        long dx = pos[X]-target[X];
+        long dy = pos[Y]-target[Y];
+        return dx*dx+dy*dy;
+	}
+
+	private int dist(int indx, int[] target, Game g){
+        int[] xy = new int[2];
+        xy[X] = g.getX(indx);
+        xy[Y] = g.getY(indx);
+        return dist(xy, target);
+	}
+
+	private int move(int ghost){
+
+	}
+
+	private void inkyMove(Game game, int mode){
+		switch (mode){
+			case SCATTER:
+
+			    break;
+			case CHASE:
+
+			    break;
+			default:break;
 		}
+		return move(INKY);
 	}
 
-	private int blinkyMove(Game game, long curtime){
-		return game.getNextGhostDir(BLINKY,game.getCurPacManLoc(),true,Game.DM.EUCLID);
+	private int blinkyMove(Game game, int mode){
+		switch (mode){
+			case SCATTER:
+
+			    break;
+			case CHASE:
+
+			    break;
+			default:break;
+		}
+		return move(BLINKY);
 	}
 
-	private int pinkyMove(Game game, long curtime){
-		return game.getNextGhostDir(PINKY,game.getCurPacManLoc(),true,Game.DM.EUCLID);
+	private int pinkyMove(Game game, int mode){
+		switch (mode){
+			case SCATTER:
+
+			    break;
+			case CHASE:
+
+			    break;
+			default:break;
+		}
+		return move(PINKY);
 	}
 
-	private int clideMove(Game game, long curtime){
-		return game.getNextGhostDir(CLIDE,game.getCurPacManLoc(),true,Game.DM.EUCLID);
+	private int clideMove(Game game, int mode){
+		switch (mode){
+			case SCATTER:
+
+			    break;
+			case CHASE:
+
+			    break;
+			default:break;
+		}
+		return move(CLIDE);
 	}
-	
-	
+
+
 	public int[] getActions(Game game,long timeDue)
 	{
 		int[] directions=new int[Game.NUM_GHOSTS];
@@ -52,12 +107,12 @@ public class MyGhosts implements GhostController
 			starttime = timeDue;
 		}; firstround = false;
 
-		directions[INKY] = inkyMove(game, timeDue);
-		directions[BLINKY] = blinkyMove(game, timeDue);
-		directions[PINKY] = pinkyMove(game, timeDue);
-		directions[CLIDE] = clideMove(game, timeDue);
-		for(int i=0;i<directions.length;i++) {
-			if (Debugging) {
+		directions[INKY] = inkyMove(game, CHASE);
+		directions[BLINKY] = blinkyMove(game, CHASE);
+		directions[PINKY] = pinkyMove(game, CHASE);
+		directions[CLIDE] = clideMove(game, CHASE);
+        if (Debugging) {
+            for(int i=0;i<directions.length;i++) {
 				Color color = Color.GRAY;
 				if (i == 0) {
 					color = Color.RED;
@@ -75,7 +130,7 @@ public class MyGhosts implements GhostController
 				//GameView.addLines(game, color, game.getCurGhostLoc(i), game.getCurPacManLoc());
 			}
 		}
-				
+
 		return directions;
 	}
 }
