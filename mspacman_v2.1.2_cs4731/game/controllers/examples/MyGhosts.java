@@ -9,8 +9,6 @@ import java.awt.Color;
 public class MyGhosts implements GhostController
 {
 	private boolean Debugging = false;
-	private long starttime;
-	private boolean firstround;
 	private int[][] targets;
 	private static final int X = 0;
 	private static final int Y = 1;
@@ -33,7 +31,6 @@ public class MyGhosts implements GhostController
 	{
 		Debugging = debugging;
 		targets = new int[Game.NUM_GHOSTS][2];
-		firstround = true;
 	}
 
 	private long dist(int[] pos, int[] target){ // the euclidian distance except squared because floats suck
@@ -178,14 +175,39 @@ public class MyGhosts implements GhostController
 	public int[] getActions(Game game,long timeDue)
 	{
 		int[] directions=new int[Game.NUM_GHOSTS];
-		int time = game.getLevelTime(); // 1000/delay per second
+		int time = game.getLevelTime(); // 1000/Game.DELAY per second
 		int mode = CHASE;
-		if(firstround){
-			starttime = timeDue;
-		}; firstround = false;
+		boolean CruiseElroyMode = false; // override scatter mode for blinky
+
+		/*
+            time in seconds < t seconds
+            time*Game.DELAY < t*1000
+
+            Scatter for 7 seconds, then Chase for 20 seconds.
+            Scatter for 7 seconds, then Chase for 20 seconds.
+            Scatter for 5 seconds, then Chase for 20 seconds.
+            Scatter for 5 seconds, then switch to Chase mode permanently.
+        */
+        if(time*Game.DELAY < 7*1000){
+            mode = SCATTER;
+        } else if(time*Game.DELAY < (7+20)*1000){
+            mode = CHASE;
+        } else if(time*Game.DELAY < (7+20+7)*1000){
+            mode = SCATTER;
+        } else if(time*Game.DELAY < (7+20+7+20)*1000){
+            mode = CHASE;
+        } else if(time*Game.DELAY < (7+20+7+20+5)*1000){
+            mode = SCATTER;
+        } else if(time*Game.DELAY < (7+20+7+20+5+20)*1000){
+            mode = CHASE;
+        } else if(time*Game.DELAY < (7+20+7+20+5+20+5)*1000){
+            mode = SCATTER;
+        } else {
+            mode = CHASE;
+        }
 
         if(game.ghostRequiresAction(BLINKY)){
-            directions[BLINKY] = blinkyMove(game, mode);
+            directions[BLINKY] = blinkyMove(game, CruiseElroyMode?CHASE:mode);
 		}
         if(game.ghostRequiresAction(PINKY)){
             directions[PINKY] = pinkyMove(game, mode);
@@ -198,7 +220,7 @@ public class MyGhosts implements GhostController
 		}
         if (Debugging) {
             int[] pacmanPos = getXY(game.getCurPacManLoc(), game);
-            System.out.println("time: "+time+" mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???"));
+            System.out.println("time: "+time+" ("+time*Game.DELAY/1000.0+") mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???"));
             for(int i=0;i<directions.length;i++) {
 				Color color = Color.GRAY;
 				if (i == 0) {
