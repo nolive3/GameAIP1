@@ -10,6 +10,7 @@ public class MyGhosts implements GhostController
 {
 	private boolean Debugging = false;
 	private int[][] targets;
+	private int time;
 	private static final int X = 0;
 	private static final int Y = 1;
 	private static final int BLINKY = 0;
@@ -30,6 +31,7 @@ public class MyGhosts implements GhostController
 	public MyGhosts(boolean debugging)
 	{
 		Debugging = debugging;
+		time = 0;
 		targets = new int[Game.NUM_GHOSTS][2];
 	}
 
@@ -175,7 +177,7 @@ public class MyGhosts implements GhostController
 	public int[] getActions(Game game,long timeDue)
 	{
 		int[] directions=new int[Game.NUM_GHOSTS];
-		int time = game.getLevelTime(); // 1000/Game.DELAY per second
+		int time++; // 1000/Game.DELAY per second
 		int mode = CHASE;
 		boolean CruiseElroyMode = game.getNumActivePills()/(float)game.getNumberPills()<.5; // override scatter mode for blinky
 
