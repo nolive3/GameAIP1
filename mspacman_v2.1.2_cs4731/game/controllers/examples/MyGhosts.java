@@ -221,7 +221,8 @@ public class MyGhosts implements GhostController
         if (Debugging) {
             int[] pacmanPos = getXY(game.getCurPacManLoc(), game);
             System.out.println("time: "+time+" ("+time*Game.DELAY/1000.0+") mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???")+ "CruiseElroyMode: "+CruiseElroyMode);
-            for(int i=0;i<directions.length;i++) {
+            for(int i=0;i<targets.length;i++) {
+                int[] ghostPos = getXY(game.getCurGhostLoc(i), game);
 				Color color = Color.GRAY;
 				if (i == 0) {
 					color = Color.RED;
@@ -235,8 +236,8 @@ public class MyGhosts implements GhostController
 				else {
 					color = Color.BLUE;
 				}
-				GameView.addPoints(game, color, game.getGhostPath(i, game.getCurPacManLoc()));
-				//GameView.addLines(game, color, game.getCurGhostLoc(i), game.getCurPacManLoc());
+				//GameView.addPoints(game, color, game.getGhostPath(i, game.getCurPacManLoc()));
+				GameView.addLines(game, color, targets[i][X], targets[i][Y], ghostPos[X], ghostPos[Y]);
 			}
 		}
 
