@@ -177,7 +177,7 @@ public class MyGhosts implements GhostController
 		int[] directions=new int[Game.NUM_GHOSTS];
 		int time = game.getLevelTime(); // 1000/Game.DELAY per second
 		int mode = CHASE;
-		boolean CruiseElroyMode = false; // override scatter mode for blinky
+		boolean CruiseElroyMode = game.getNumActivePills()/(float)game.getNumberPills()<.5; // override scatter mode for blinky
 
 		/*
             time in seconds < t seconds
@@ -220,7 +220,7 @@ public class MyGhosts implements GhostController
 		}
         if (Debugging) {
             int[] pacmanPos = getXY(game.getCurPacManLoc(), game);
-            System.out.println("time: "+time+" ("+time*Game.DELAY/1000.0+") mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???"));
+            System.out.println("time: "+time+" ("+time*Game.DELAY/1000.0+") mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???")+ "CruiseElroyMode: "+CruiseElroyMode);
             for(int i=0;i<directions.length;i++) {
 				Color color = Color.GRAY;
 				if (i == 0) {
