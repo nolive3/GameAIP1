@@ -162,7 +162,7 @@ public class MyGhosts implements GhostController
 			case CHASE:
                 long distToPacman = dist(game.getCurGhostLoc(CLIDE), game.getCurPacManLoc(), game);
                 targets[CLIDE] = CLIDEHOME; // go home
-                if(distToPacman > 8*8){ // 8*8 because dist calculates with out the sqrt to avoid needing floating point
+                if(distToPacman > 8*4*8*4){ // 8*8 because dist calculates with out the sqrt to avoid needing floating point
                     targets[CLIDE] = getXY(game.getCurPacManLoc(), game); // same target as BLINKY if too far from pacman
                 }
 			    break;
