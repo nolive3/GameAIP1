@@ -14,12 +14,19 @@ public class MyGhosts implements GhostController
 	private int[][] targets;
 	private static final int X = 0;
 	private static final int Y = 1;
-	private static final int INKY = 0;
-	private static final int BLINKY = 1;
-	private static final int PINKY = 2;
-	private static final int CLIDE = 3;
+	private static final int BLINKY = 0;
+	private static final int PINKY = 1;
+	private static final int CLIDE = 2;
+	private static final int INKY = 3;
+	private static final int WIDTH = 4;
+	private static final int HIGHT = 4;
+	private static final int[] BLINKYHOME = {25*WIDTH,-3*HIGHT};
+	private static final int[] PINKYHOME = {2*WIDTH,-3*HIGHT};
+	private static final int[] CLIDEHOME = {0*WIDTH,32*HIGHT};
+	private static final int[] INKYHOME = {27*WIDTH,32*HIGHT};
 	private static final int SCATTER = 0;
 	private static final int CHASE = 1;
+	private static final int[] DIRS = {Game.UP,Game.LEFT,Game.DOWN,Game.RIGHT};
 
 
 	public MyGhosts(boolean debugging)
@@ -29,89 +36,169 @@ public class MyGhosts implements GhostController
 		firstround = true;
 	}
 
-	private long dist(int[] pos, int[] target){
+	private long dist(int[] pos, int[] target){ // the euclidian distance except squared because floats suck
         long dx = pos[X]-target[X];
         long dy = pos[Y]-target[Y];
         return dx*dx+dy*dy;
 	}
 
-	private int dist(int indx, int[] target, Game g){
+	private int[] getXY(int indx, Game g){
         int[] xy = new int[2];
         xy[X] = g.getX(indx);
         xy[Y] = g.getY(indx);
-        return dist(xy, target);
+        return xy;
+	}
+    /*
+        these just replaces the ones that are passed as index with x,y and sends the work to the main int[],int[] function
+    */
+	private long dist(int pos, int[] target, Game g){
+        return dist(getXY(pos,g), target);
 	}
 
-	private int move(int ghost){
-
+	private long dist(int pos, int target, Game g){
+        return dist(getXY(pos,g), getXY(target,g));
 	}
 
-	private void inkyMove(Game game, int mode){
-		switch (mode){
-			case SCATTER:
+	private long dist(int[] pos, int target, Game g){
+        return dist(pos, getXY(target,g));
+	}
 
-			    break;
-			case CHASE:
-
-			    break;
-			default:break;
-		}
-		return move(INKY);
+	private int move(int ghost, Game g){
+        int[] moves = g.getGhostNeighbours(ghost);
+        long min = Long.MAX_VALUE;
+        int move = -1;
+        for(int dir:DIRS){
+            if(moves[dir]!=-1){
+                long cur = dist(moves[dir], targets[ghost], g);
+                if(cur<min){
+                    min = cur;
+                    move = dir;
+                }
+            }
+        }
+        return move;
 	}
 
 	private int blinkyMove(Game game, int mode){
 		switch (mode){
 			case SCATTER:
-
+                targets[BLINKY] = BLINKYHOME;
 			    break;
 			case CHASE:
-
+                targets[BLINKY] = getXY(game.getCurPacManLoc(), game); // pacman
 			    break;
 			default:break;
 		}
-		return move(BLINKY);
+		return move(BLINKY, game);
 	}
 
 	private int pinkyMove(Game game, int mode){
 		switch (mode){
 			case SCATTER:
-
+                targets[PINKY] = PINKYHOME;
 			    break;
 			case CHASE:
-
+                targets[PINKY] = getXY(game.getCurPacManLoc(), game);
+                switch (game.getCurPacManDir()){
+                    case Game.UP:
+                        targets[PINKY][Y] -= 4*HIGHT;
+                        targets[PINKY][X] -= 4*WIDTH; //recreating the bug
+                        break;
+                    case Game.DOWN:
+                        targets[PINKY][Y] += 4*HIGHT;
+                        break;
+                    case Game.LEFT:
+                        targets[PINKY][X] -= 4*WIDTH;
+                        break;
+                    case Game.RIGHT:
+                        targets[PINKY][X] += 4*WIDTH;
+                        break;
+                    default: break;
+                } // spot 4 in front of pacman
 			    break;
 			default:break;
 		}
-		return move(PINKY);
+		return move(PINKY, game);
+	}
+
+	private int inkyMove(Game game, int mode){
+		switch (mode){
+			case SCATTER:
+                targets[INKY] = INKYHOME;
+			    break;
+			case CHASE:
+                targets[INKY] = getXY(game.getCurPacManLoc(), game);
+                switch (game.getCurPacManDir()){
+                    case Game.UP:
+                        targets[PINKY][Y] -= 2*HIGHT;
+                        targets[PINKY][X] -= 2*WIDTH; //recreating the bug
+                        break;
+                    case Game.DOWN:
+                        targets[PINKY][Y] += 2*HIGHT;
+                        break;
+                    case Game.LEFT:
+                        targets[PINKY][X] -= 2*WIDTH;
+                        break;
+                    case Game.RIGHT:
+                        targets[PINKY][X] += 2*WIDTH;
+                        break;
+                    default: break;
+                } // gets spot 2 in front of pacman
+                int[] xy = getXY(game.getCurGhostLoc(BLINKY), game); // BLINKY's position
+                targets[INKY][X] -= xy[X];
+                targets[INKY][Y] -= xy[Y]; // subtract off BLINKY's position to get a blinky relative vector
+                targets[INKY][X] *= 2;
+                targets[INKY][Y] *= 2; // double the length of the pinky relative vector
+                targets[INKY][X] += xy[X];
+                targets[INKY][Y] += xy[Y]; //add back BLINKY's position to get back to a 0,0 relative position
+			    break;
+			default:break;
+		}
+		return move(INKY, game);
 	}
 
 	private int clideMove(Game game, int mode){
 		switch (mode){
 			case SCATTER:
-
+                targets[CLIDE] = CLIDEHOME;
 			    break;
 			case CHASE:
-
+                long distToPacman = dist(game.getCurGhostLoc(CLIDE), game.getCurPacManLoc(), game);
+                targets[CLIDE] = CLIDEHOME; // go home
+                if(distToPacman > 8*8){ // 8*8 because dist calculates with out the sqrt to avoid needing floating point
+                    targets[CLIDE] = getXY(game.getCurPacManLoc(), game); // same target as BLINKY if too far from pacman
+                }
 			    break;
 			default:break;
 		}
-		return move(CLIDE);
+		return move(CLIDE, game);
 	}
 
 
 	public int[] getActions(Game game,long timeDue)
 	{
 		int[] directions=new int[Game.NUM_GHOSTS];
-		DM[] dms=Game.DM.values();
+		int time = game.getLevelTime(); // 1000/delay per second
+		int mode = CHASE;
 		if(firstround){
 			starttime = timeDue;
 		}; firstround = false;
 
-		directions[INKY] = inkyMove(game, CHASE);
-		directions[BLINKY] = blinkyMove(game, CHASE);
-		directions[PINKY] = pinkyMove(game, CHASE);
-		directions[CLIDE] = clideMove(game, CHASE);
+        if(game.ghostRequiresAction(BLINKY)){
+            directions[BLINKY] = blinkyMove(game, mode);
+		}
+        if(game.ghostRequiresAction(PINKY)){
+            directions[PINKY] = pinkyMove(game, mode);
+		}
+        if(game.ghostRequiresAction(CLIDE)){
+            directions[CLIDE] = clideMove(game, mode);
+		}
+        if(game.ghostRequiresAction(INKY)){
+            directions[INKY] = inkyMove(game, mode);
+		}
         if (Debugging) {
+            int[] pacmanPos = getXY(game.getCurPacManLoc(), game);
+            System.out.println("time: "+time+" mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???"));
             for(int i=0;i<directions.length;i++) {
 				Color color = Color.GRAY;
 				if (i == 0) {
