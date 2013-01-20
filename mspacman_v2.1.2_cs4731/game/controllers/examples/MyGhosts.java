@@ -177,7 +177,7 @@ public class MyGhosts implements GhostController
 	public int[] getActions(Game game,long timeDue)
 	{
 		int[] directions=new int[Game.NUM_GHOSTS];
-		int time++; // 1000/Game.DELAY per second
+		time++; // 1000/Game.DELAY per second
 		int mode = CHASE;
 		boolean CruiseElroyMode = game.getNumActivePills()/(float)game.getNumberPills()<.5; // override scatter mode for blinky
 
