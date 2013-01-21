@@ -225,7 +225,7 @@ public class MyGhosts implements GhostController
         } else {
             mode = CHASE;
         }
-
+    if(inedible){
         if(game.ghostRequiresAction(BLINKY)){
             directions[BLINKY] = blinkyMove(game, CruiseElroyMode?CHASE:mode);
 		}
@@ -238,6 +238,12 @@ public class MyGhosts implements GhostController
         if(game.ghostRequiresAction(INKY)){
             directions[INKY] = inkyMove(game, mode);
 		}
+    }else{
+        directions[INKY] = -1; // random motion while edible
+        directions[BLINKY] = -1; // random motion while edible
+        directions[PINKY] = -1; // random motion while edible
+        directions[CLIDE] = -1; // random motion while edible
+    }
         if (Debugging) {
             int[] pacmanPos = getXY(game.getCurPacManLoc(), game);
             System.out.println("time ticks(seconds): "+time+" ("+time*Game.DELAY/1000.0+") mode(edible):"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???")+" ("+!inedible+") CruiseElroyMode: "+CruiseElroyMode);
