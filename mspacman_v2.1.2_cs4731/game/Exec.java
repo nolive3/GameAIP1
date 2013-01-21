@@ -32,22 +32,11 @@ public class Exec
 	{
 		Exec exec=new Exec();
 
-		//this can be used for numerical testing (non-visual, no delays)
-//		exec.runExperiment(new RandomPacMan(),new AttractRepelGhosts(true),100);
+		exec.runGameTimed(new Human(),new MyGhosts(false),true);
+	//	exec.runGameTimed(new NearestPillPacMan(),new MyGhosts(false),true);
+	//	exec.runGameTimed(new RandomNonRevPacMan(),new MyGhosts(false),true);
+	//	exec.runGameTimed(new RandomPacMan(),new MyGhosts(false),true);
 
-		//run game without time limits (un-comment if required)
-//		exec.runGame(new RandomPacMan(),new RandomGhosts(),true,G.DELAY);
-
-		//run game with time limits (un-comment if required)
-//		exec.runGameTimed(new Human(),new AttractRepelGhosts(true),true);
-		//run game with time limits. Here NearestPillPacManVS is chosen to illustrate how to use graphics for debugging/information purposes
-		exec.runGameTimed(new Human(),new MyGhosts(true),true);
-
-		//this allows you to record a game and replay it later. This could be very useful when
-		//running many games in non-visual mode - one can then pick out those that appear irregular
-		//and replay them in visual mode to see what is happening.
-//		exec.runGameTimedAndRecorded(new Human(),new AttractRepelGhosts(false),true,"human-v-Legacy2.txt");
-//		exec.replayGame("human-v-Legacy2.txt");
 	}
 
     protected int pacDir;
