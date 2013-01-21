@@ -11,6 +11,7 @@ public class MyGhosts implements GhostController
 	private boolean Debugging = false;
 	private int[][] targets;
 	private int time;
+	private boolean lairTimeOver;
 	private static final int X = 0;
 	private static final int Y = 1;
 	private static final int BLINKY = 0;
@@ -31,8 +32,15 @@ public class MyGhosts implements GhostController
 	public MyGhosts(boolean debugging)
 	{
 		Debugging = debugging;
-		time = 0;
 		targets = new int[Game.NUM_GHOSTS][2];
+		reset(true);
+	}
+
+	public void reset(boolean nextLevel){
+	    if(nextLevel){
+            time = 0;
+	    }
+        lairTimeOver = false;
 	}
 
 	private long dist(int[] pos, int[] target){ // the euclidian distance except squared because floats suck
@@ -177,10 +185,13 @@ public class MyGhosts implements GhostController
 	public int[] getActions(Game game,long timeDue)
 	{
 		int[] directions=new int[Game.NUM_GHOSTS];
-		time++; // 1000/Game.DELAY per second
+		boolean inedible = (game.getEdibleTime(INKY)==0)&&(game.getEdibleTime(BLINKY)==0)&&(game.getEdibleTime(PINKY)==0)&&(game.getEdibleTime(CLIDE)==0);
+		lairTimeOver |= (game.getLairTime(INKY)==0)&&(game.getLairTime(BLINKY)==0)&&(game.getLairTime(PINKY)==0)&&(game.getLairTime(CLIDE)==0);
 		int mode = CHASE;
-		boolean CruiseElroyMode = game.getNumActivePills()/(float)game.getNumberPills()<.5; // override scatter mode for blinky
-
+		boolean CruiseElroyMode = game.getNumActivePills()/(float)game.getNumberPills()<.33 && lairTimeOver; // override scatter mode for blinky
+        if(inedible){
+            time++; // 1000/Game.DELAY per second
+        }
 		/*
             time in seconds < t seconds
             time*Game.DELAY < t*1000
@@ -222,7 +233,7 @@ public class MyGhosts implements GhostController
 		}
         if (Debugging) {
             int[] pacmanPos = getXY(game.getCurPacManLoc(), game);
-            System.out.println("time: "+time+" ("+time*Game.DELAY/1000.0+") mode:"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???")+ "CruiseElroyMode: "+CruiseElroyMode);
+            System.out.println("time ticks(seconds): "+time+" ("+time*Game.DELAY/1000.0+") mode(edible):"+ (mode == CHASE? "CHASE":mode==SCATTER?"SCATTER":"???")+" ("+!inedible+") CruiseElroyMode: "+CruiseElroyMode);
             for(int i=0;i<targets.length;i++) {
                 int[] ghostPos = getXY(game.getCurGhostLoc(i), game);
 				Color color = Color.GRAY;
