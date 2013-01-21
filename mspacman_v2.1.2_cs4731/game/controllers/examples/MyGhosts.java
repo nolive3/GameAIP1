@@ -5,6 +5,8 @@ import game.core.Game.DM;
 import game.core.Game;
 import game.core.GameView;
 import java.awt.Color;
+import java.util.ArrayList;
+import java.lang.ref.WeakReference;
 
 public class MyGhosts implements GhostController
 {
@@ -27,19 +29,24 @@ public class MyGhosts implements GhostController
 	private static final int SCATTER = 0;
 	private static final int CHASE = 1;
 	private static final int[] DIRS = {Game.UP,Game.LEFT,Game.DOWN,Game.RIGHT};
+	public static ArrayList<WeakReference<MyGhosts>> inst;
 
 
 	public MyGhosts(boolean debugging)
 	{
+	    if(inst == null){
+            inst = new ArrayList<WeakReference<MyGhosts>>();
+	    }
 		Debugging = debugging;
 		targets = new int[Game.NUM_GHOSTS][2];
+        inst.add(new WeakReference<MyGhosts>(this));
 		reset(true);
 	}
 
 	public void reset(boolean nextLevel){
 	    if(nextLevel){
-            time = 0;
 	    }
+        time = 0;
         lairTimeOver = false;
 	}
 
